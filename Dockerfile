@@ -42,7 +42,7 @@ WORKDIR /usr/src/owncloud
 # Install new nginx.conf
 RUN mkdir -p $CONF_DIR \
         && rm /etc/nginx.conf \
-        && cp nginx.conf $CONF_DIR/nginx.conf
+        && cp nginx.conf $CONF_DIR/nginx.conf \
         && ln -s $CONF_DIR/nginx.conf /etc/nginx.conf
 
 # Install application

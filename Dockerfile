@@ -13,8 +13,7 @@ ENV WEB_ROOT /usr/local/nginx/html
 ENV OC_CONF_DIR /usr/local/nginx/html/config
 
 # All our dependencies, in alphabetical order (to ease maintenance)
-RUN rm /etc/mime.types \
-&& apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get -o Dpkg::Options::="--force-confold" install -y --no-install-recommends \
         php5-curl \
         php5-fpm \
         php5-gd \
@@ -30,7 +29,7 @@ RUN rm /etc/mime.types \
 # Try to change libav-tools to libavcodec55
 # Would appreciate if owncloud devs were a bit more specific here
 # May make a version without some of the bloat in future
-RUN apt-get install -y --no-install-recommends\
+RUN apt-get install -y --no-install-recommends \
         libav-tools \
         libreoffice \
         smbclient

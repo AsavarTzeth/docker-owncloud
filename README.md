@@ -7,7 +7,8 @@ The following environment variables are also honored for configuring your ownClo
 - -e `OWNCLOUD_DOMAIN_NAME=...` (defaults to container hostname)
 - -e `OWNCLOUD_SSL_CERT=...` (defaults to self-signed cert, generated at runtime)
 - -e `OWNCLOUD_SSL_KEY=...` (defaults to self-generated key, generated at runtime)
-- -e `OWNCLOUD_DB_TYPE=...` (defaults to sqlite)
+- -e `OWNCLOUD_DB_TYPE=...` (defaults to sqlite)  
+Possible Values: sqlite, mysql, pgsql
 - -e `OWNCLOUD_DB_NAME=...` (defaults to owncloud)
 - -e `OWNCLOUD_DB_USER=...` (defaults to root)
 - -e `OWNCLOUD_DB_PASSWORD=...` (defaults to the value of the MYSQL_ROOT_PASSWORD environment variable from the linked mysql/mariadb container)

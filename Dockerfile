@@ -39,16 +39,14 @@ ADD . /usr/src/owncloud
 WORKDIR /usr/src/owncloud
 
 # Install new nginx.conf
+# This needs to be moved to docker-entrypoint.sh, only keep mkdir & rm /etc/nginx.conf
 RUN mkdir -p $CONF_DIR \
         && rm /etc/nginx.conf \
         && cp nginx.conf $CONF_DIR/nginx.conf \
         && ln -s $CONF_DIR/nginx.conf /etc/nginx.conf
 
 # Install application
-RUN tar --strip-components=1 -xf owncloud-*.tar.bz2 -C "$WEB_ROOT" \
-        && chown -R www-data:www-data "$WEB_ROOT" \
-        && find "$WEB_ROOT" -type d -exec chmod 750 {} \; \
-        && find "$WEB_ROOT" -type f -exec chmod 640 {} \;
+RUN tar --strip-components=1 -xf owncloud-*.tar.bz2
 
 # Find config files and edit
 RUN find "$OC_CONF_DIR" -type f -exec sed -ri ' \

@@ -43,6 +43,7 @@ WORKDIR /usr/src/owncloud
 RUN mkdir -p $CONF_DIR \
         && rm /etc/nginx.conf \
         && cp nginx.conf $CONF_DIR/nginx.conf
+        && ln -s $CONF_DIR/nginx.conf /etc/nginx.conf
 
 # Install application
 RUN tar --strip-components=1 -xf owncloud-*.tar.bz2 -C "$WEB_ROOT" \

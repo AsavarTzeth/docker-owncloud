@@ -10,6 +10,9 @@ set -e
 : ${OC_DB_TYPE:=sqlite}
 : ${OC_DB_NAME:=owncloud}
 
+# ADD THIS: If no ssl cert/key is supplied autogenerate one.
+# Then if domain name is supplied rename them accordingly.
+
 # Common config edit function
 set_config() {
     key="$1"

@@ -11,7 +11,6 @@ The following environment variables are also honored for configuring your ownClo
 - -e `OWNCLOUD_DB_NAME=...` (defaults to owncloud)
 - -e `OWNCLOUD_DB_USER=...` (defaults to root)
 - -e `OWNCLOUD_DB_PASSWORD=...` (defaults to the value of the MYSQL_ROOT_PASSWORD environment variable from the linked mysql/mariadb container)
-- -e `OWNCLOUD_DB_LISTEN=...` (defaults to 127.0.0.1:9000)  
 Alternative value: localhost:/var/run/php5-fpm.sock
 - -e `OWNCLOUD_DB_PASSWORD_SALT=...` (default to unique random SHA1s)
 - -e `OWNCLOUD_FORCE_SSL=...` (defaults to true (nginx conf is not tested with false yet) )

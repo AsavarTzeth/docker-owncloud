@@ -4,15 +4,13 @@
 
 The example above will run the container, but will not protect valuable data. Please read the Volumes section bellow, then use the detailed step by step guide, if you need it.
 
-*Note! Currenlty I have opted for a sepperate php5-fpm instance, but this will be optional in the future, to make it truly stand-alone.*
+*Note! Currenlty I have opted for a sepperate [php5-fpm](https://registry.hub.docker.com/u/asavartzeth/php5-fpm/) instance, but this will be optional in the future.*
 
 ##Configuration##
 
 The following environment variables are also honored for configuring your ownCloud instance:
 
 - -e `OWNCLOUD_DOMAIN_NAME=...` (defaults to localhost)
-- -e `OWNCLOUD_SSL_CERT=...` (defaults to /etc/ssl/owncloud/ssl.crt) (if unsure, leave be)
-- -e `OWNCLOUD_SSL_KEY=...` (defaults to /etc/ssl/owncloud/ssl.key) (if unsure, leave be)
 - -e `OWNCLOUD_DB_TYPE=...` (defaults to sqlite)  
 Possible Values: sqlite, mysql, pgsql
 - -e `OWNCLOUD_DB_NAME=...` (defaults to owncloud)
@@ -22,6 +20,8 @@ Alternative value: localhost:/var/run/php5-fpm.sock
 - -e `OWNCLOUD_FORCE_SSL=...` (defaults to true (nginx conf is not tested with false yet) )
 - -e `OWNCLOUD_LOG_LEVEL=...` (defaults to WARN)  
 Possible Values: DEBUG, INFO, WARN, ERROR
+- -e `OWNCLOUD_SSL_CERT=...` (defaults to /etc/ssl/nginx/ssl.crt) (if unsure, leave be)
+- -e `OWNCLOUD_SSL_KEY=...` (defaults to /etc/ssl/nginx/ssl.key) (if unsure, leave be)
 
 If the `OWNCLOUD_DB_NAME` specified does not already exist in the given MySQL/MariaDB container, it will be created automatically upon container startup, provided that the `OWNCLOUD_DB_USER` specified has the necessary permissions to create it.
 
@@ -37,9 +37,9 @@ In the future I might put in an `OWNCLOUD_DATA_TRUE` variable, or similar that y
 
 ##Adding a SSL certificate##
 
-By default the entrypoint script will create a self-signed certificate and place it in */etc/ssl/owncloud/*. You may change the location to fit your need with the honored environment variables listed above.
+By default the entrypoint script will create a self-signed certificate and place it in */etc/ssl/nginx/*. You may change the location to fit your need with the honored environment variables listed above.
 
-Currently the best way of adding a cert & key to your container is with a Dockerfile, using "ADD /path/to/ssl/on/host /etc/ssl/owncloud/ssl.crt|key". This requires full knowledge of Dockerfiles and is not ideal for users. I would prefer it if docker.io added support for "docker add" as a command line argument. This could then be used for simple things like copying files to containers, and then commiting it automatically for you.
+Currently the best way of adding a cert & key to your container is with a Dockerfile, using "ADD /path/to/ssl/on/host /etc/ssl/nginx/ssl.(crt|key)". This requires full knowledge of Dockerfiles and is not ideal for users. I would prefer it if docker.io added support for "docker add" as a command line argument.
 
 If anyone have a user-friendly way of adding files to already built and running containers, please share it.
 
@@ -51,7 +51,7 @@ First make sure you have tianon/true on your system.
 
 Then create a volume-only container.
 
-    sudo docker run -d -v /etc/ssl/owncloud -v /usr/local/nginx/html/data -v /usr/local/nginx/config --name oc_data tianon/true
+    sudo docker run -d -v /etc/ssl/nginx -v /usr/local/nginx/html/data -v /usr/local/nginx/config --name oc_data tianon/true
 
 Lastly use the --volumes-from flag to mount the volumes in the owncloud container.
 

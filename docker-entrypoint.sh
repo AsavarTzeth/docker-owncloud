@@ -48,6 +48,8 @@ fi
 : ${PHP5_FPM_LOG_LEVEL:=notice}
 : ${PHP5_FPM_LISTEN:=127.0.0.1:9000}
 
+# TODO Implement UNIX socket setting in MariaDB container and maybe make pull request to MySQL, after testing that is.
+
 # If we're linked to PHP5-FPM, transfer settings so they are the same
 if [ -n "$PHP5_FPM_PORT_9000_TCP" ]; then
     : ${PHP5_FPM_MEMORY_LIMIT:=$PHP5_FPM_ENV_PHP5_FPM_MEMORY_LIMIT}
@@ -55,13 +57,12 @@ if [ -n "$PHP5_FPM_PORT_9000_TCP" ]; then
     : ${PHP5_FPM_MEMORY_LISTEN:=$PHP5_FPM_ENV_PHP5_FPM_LISTEN}
 fi
 
-: ${OWNCLOUD_SSL_CERT:=/etc/ssl/nginx/cloud.example.com.crt}
-: ${OWNCLOUD_SSL_CERT_KEY:=/etc/ssl/nginx/cloud.example.com.key}
-
-# If no SSL certificate 
-if [  ]; then
+# If no SSL certificate
+if [ -f "$SSL_DIR/ssl.crt" -a -f "$SSL_DIR/ssl.key" ]; then
     
 fi
+
+# TODO If no ssl cert/key is supplied autogenerate one.
 
 if ! [ -e index.php -a -e version.php ]; then
 	echo >&2 "ownCloud not found in $WEB_ROOT - copying now..."
@@ -144,11 +145,6 @@ EOPHP
 
 # FIX: Just like wordpess check "$PHP5_FPM_LISTEN" for optional unix socket setting.
 # In any case setting should be taken from there and fall back to default. No user entry required.
-
-# IDEA: Implement UNIX socket setting in MariaDB and pull request to MySQL
-
-# IDEA: If no ssl cert/key is supplied autogenerate one.
-# Then if domain name is supplied rename them accordingly.
 
 # IDEA: Detect if sql container is linked and override $OWNCLOUD_DB_TYPE accordingly
 

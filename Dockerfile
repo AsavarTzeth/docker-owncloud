@@ -48,7 +48,7 @@ RUN find "$CONF_OWNCLOUD" -type f -exec sed -ri ' \
 
 WORKDIR /usr/local/nginx/html
 
-VOLUME ["/etc/ssl/nginx"]
+VOLUME ["/etc/ssl/owncloud"]
 VOLUME ["/usr/local/nginx/html/data" "/usr/local/nginx/html/config"]
 
 ADD docker-entrypoint.sh /entrypoint.sh

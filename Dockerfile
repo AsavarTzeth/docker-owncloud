@@ -7,6 +7,7 @@ ENV DEBIAN_FRONTEND noninteractive
 # Environment variables
 ENV WEB_ROOT /usr/local/nginx/html
 ENV SRC_DIR /usr/src/owncloud
+ENV SSL_DIR /etc/ssl/owncloud
 ENV CONF_NGINX /etc
 ENV CONF_PHP5 /etc/php5/fpm
 ENV CONF_OWNCLOUD /usr/local/nginx/html/config

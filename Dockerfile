@@ -7,7 +7,7 @@ ENV DEBIAN_FRONTEND noninteractive
 # Environment variables
 ENV WEB_ROOT /usr/local/nginx/html
 ENV SRC_DIR /usr/src/owncloud
-ENV SSL_DIR /etc/ssl/owncloud
+ENV SSL_DIR /etc/ssl/nginx
 ENV CONF_NGINX /etc
 ENV CONF_PHP5 /etc/php5/fpm
 ENV CONF_OWNCLOUD /usr/local/nginx/html/config
@@ -41,14 +41,9 @@ WORKDIR /usr/src/owncloud
 # Extract ownCloud archive
 RUN tar --strip-components=1 -xf owncloud-*.tar.bz2
 
-# Find config files and edit
-RUN find "$CONF_OWNCLOUD" -type f -exec sed -ri ' \
-    s|(\S*logfile\S\s+=>).*|\1 "/proc/self/fd/3",|g; \
-' '{}' ';'
-
 WORKDIR /usr/local/nginx/html
 
-VOLUME ["/etc/ssl/owncloud"]
+VOLUME ["/etc/ssl/nginx"]
 VOLUME ["/usr/local/nginx/html/data" "/usr/local/nginx/html/config"]
 
 ADD docker-entrypoint.sh /entrypoint.sh

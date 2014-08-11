@@ -5,12 +5,8 @@ $CONFIG = array(
 "dbuser" => "root",
 "dbpassword" => "",
 "dbhost" => "localhost",
-"passwordsalt" => "",
+"dbtableprefix" => "oc",
 "forcessl" => true
-"memcached_servers" => array(
-array('localhost', 11211),
-),
-"logfile" => "",
-"loglevel" => "",
-'enable_previews' => true,
+"logfile" => "/proc/self/fd/1",
+"loglevel" => "WARN",
 );

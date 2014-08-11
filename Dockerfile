@@ -4,13 +4,12 @@ MAINTAINER Patrik Nilsson <asavartzeth@gmail.com>
 # Let the conatiner know that there is no tty
 ENV DEBIAN_FRONTEND noninteractive
 
-# Common environment variables
-ENV CONF_DIR /usr/local/nginx/conf
-ENV DATA_DIR /usr/local/nginx/html/data
-
-# Container specific environment variables
+# Environment variables
 ENV WEB_ROOT /usr/local/nginx/html
-ENV OC_CONF_DIR /usr/local/nginx/html/config
+ENV SRC_DIR /usr/src/owncloud
+ENV CONF_NGINX /etc
+ENV CONF_PHP5 /etc/php5/fpm
+ENV CONF_OWNCLOUD /usr/local/nginx/html/config
 
 # All our dependencies, in alphabetical order (to ease maintenance)
 RUN apt-get update && apt-get -o Dpkg::Options::="--force-confold" install -y --no-install-recommends \
@@ -38,22 +37,18 @@ RUN apt-get install -y --no-install-recommends \
 ADD . /usr/src/owncloud
 WORKDIR /usr/src/owncloud
 
-# Install new nginx.conf
-# This needs to be moved to docker-entrypoint.sh, only keep mkdir & rm /etc/nginx.conf
-RUN mkdir -p $CONF_DIR \
-        && rm /etc/nginx.conf \
-        && cp nginx.conf $CONF_DIR/nginx.conf \
-        && ln -s $CONF_DIR/nginx.conf /etc/nginx.conf
-
-# Install application
+# Extract ownCloud archive
 RUN tar --strip-components=1 -xf owncloud-*.tar.bz2
 
 # Find config files and edit
-RUN find "$OC_CONF_DIR" -type f -exec sed -ri ' \
+RUN find "$CONF_OWNCLOUD" -type f -exec sed -ri ' \
     s|(\S*logfile\S\s+=>).*|\1 "/proc/self/fd/3",|g; \
 ' '{}' ';'
 
 WORKDIR /usr/local/nginx/html
+
+VOLUME ["/etc/ssl/nginx"]
+VOLUME ["/usr/local/nginx/html/data" "/usr/local/nginx/html/config"]
 
 ADD docker-entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]

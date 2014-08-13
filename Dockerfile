@@ -5,12 +5,12 @@ MAINTAINER Patrik Nilsson <asavartzeth@gmail.com>
 ENV DEBIAN_FRONTEND noninteractive
 
 # Environment variables
-ENV WEB_ROOT /usr/local/nginx/html
+ENV WEB_ROOT /usr/local/nginx/html/owncloud
 ENV SRC_DIR /usr/src/owncloud
-ENV SSL_DIR /etc/ssl/nginx
+ENV SSL_DIR /usr/local/nginx/ssl
 ENV CONF_NGINX /etc
 ENV CONF_PHP5 /etc/php5/fpm
-ENV CONF_OWNCLOUD /usr/local/nginx/html/config
+ENV CONF_OWNCLOUD /usr/local/nginx/html/owncloud/config
 
 # All our dependencies, in alphabetical order (to ease maintenance)
 RUN apt-get update && apt-get -o Dpkg::Options::="--force-confold" install -y --no-install-recommends \
@@ -24,7 +24,8 @@ RUN apt-get update && apt-get -o Dpkg::Options::="--force-confold" install -y --
         php5-mhash \
         php5-mysql \
         php5-pgsql \
-        php5-sqlite
+	php5-sqlite \
+	rsync
 # Extra functionality
 # Try to change libav-tools to libavcodec55
 # Would appreciate if owncloud devs were a bit more specific here
@@ -34,19 +35,13 @@ RUN apt-get install -y --no-install-recommends \
         libreoffice \
         smbclient
 
-# Add application files
-ADD . /usr/src/owncloud
 WORKDIR /usr/src/owncloud
-
-# Extract ownCloud archive
-RUN tar --strip-components=1 -xf owncloud-*.tar.bz2
-
-WORKDIR /usr/local/nginx/html
-
-VOLUME ["/etc/ssl/nginx"]
-VOLUME ["/usr/local/nginx/html/data" "/usr/local/nginx/html/config"]
+ADD . /usr/src/owncloud
+RUN rm $CONF_NGINX/nginx.conf && \
+    tar --strip-components=1 -xf owncloud-*.tar.bz2
 
 ADD docker-entrypoint.sh /entrypoint.sh
+RUN chmod 744 /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
 EXPOSE 80 443

@@ -16,7 +16,7 @@ if [ "$OWNCLOUD_DB_TYPE" != 'sqlite' ]; then
 
 	# If database link of type "pgsql" is missing, exit. Also catches spelling errors.
 	if [ -z "$POSTGRES_PORT_5432_TCP" -a "$OWNCLOUD_DB_TYPE" != 'mysql' ]; then
-		echo >&2 'error: missing MYSQL_PORT_3306_TCP environment variable'
+		echo >&2 'error: missing POSTGRES_PORT_5432_TCP environment variable'
 		echo >&2 ' Did you forget to --link some_postgres_container:postgres ?'
 		echo >&2 ' Or did you mistype "pgsql" ?'
 		exit 1
@@ -59,8 +59,8 @@ fi
 # TODO check value "$PHP5_FPM_LISTEN" in case unix socket is used. If it is edit nginx.conf accordingly.
 
 # If no SSL certificate exists generate a self-signed one.
-: ${OWNCLOUD_SSL_CERT:=/etc/ssl/nginx/ssl.crt}
-: ${OWNCLOUD_SSL_CERT_KEY:=/etc/ssl/nginx/ssl.key}
+: ${OWNCLOUD_SSL_CERT:=$SSL_DIR/ssl.crt}
+: ${OWNCLOUD_SSL_CERT_KEY:=$SSL_DIR/ssl.key}
 if [ -f "$SSL_DIR/ssl.crt" -a -f "$SSL_DIR/ssl.key" ]; then
     openssl req -x509 -newkey rsa:2048 -keyout $SSL_DIR/ssl.key -out $SSL_DIR/ssl.crt -nodes -days XXX
     chmod 600 $SSL_DIR/ssl.*

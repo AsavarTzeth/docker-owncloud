@@ -14,6 +14,7 @@ ENV CONF_OWNCLOUD /usr/local/nginx/html/owncloud/config
 
 # All our dependencies, in alphabetical order (to ease maintenance)
 RUN apt-get update && apt-get -o Dpkg::Options::="--force-confold" install -y --no-install-recommends \
+	expect \
 	openssl \
         php5-curl \
         php5-fpm \

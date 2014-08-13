@@ -61,14 +61,14 @@ fi
 # If no SSL certificate exists generate a self-signed one.
 : ${OWNCLOUD_SSL_CERT:=$SSL_DIR/ssl.crt}
 : ${OWNCLOUD_SSL_CERT_KEY:=$SSL_DIR/ssl.key}
-if [ -f "$SSL_DIR/ssl.crt" -a -f "$SSL_DIR/ssl.key" ]; then
+if ! [ -f "$SSL_DIR/ssl.crt" -a -f "$SSL_DIR/ssl.key" ]; then
     openssl req -x509 -newkey rsa:2048 -keyout $SSL_DIR/ssl.key -out $SSL_DIR/ssl.crt -nodes -days XXX
     chmod 600 $SSL_DIR/ssl.*
 fi
 
 # TODO handle and use a CA, preferably located outside container, so certificates can be revoked.
 
-if ! [ -e index.php -a -e version.php ]; then
+if ! [ -e $WEB_ROOT/index.php -a -e $WEB_ROOT/version.php ]; then
     echo >&2 "owncloud not found in $WEB_ROOT - copying now..."
     rsync --archive --one-file-system --quiet --exclude='*.sh' --exclude='*.conf' --exclude='*.bz2*' --exclude='Dockerfile' $SRC_DIR $WEB_ROOT/..
     chown -R www-data:www-data $WEB_ROOT

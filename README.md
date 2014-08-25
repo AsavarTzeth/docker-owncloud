@@ -51,7 +51,7 @@ First make sure you have tianon/true on your system.
 
 Then create a volume-only container.
 
-    sudo docker run -d -v /etc/ssl/nginx -v /usr/local/nginx/html/data -v /usr/local/nginx/config --name oc_data tianon/true
+    sudo docker run -d -v /usr/local/nginx/ssl -v /usr/local/nginx/html/owncloud/data -v /usr/local/nginx/html/owncloud/config --name oc_data tianon/true
 
 Lastly use the --volumes-from flag to mount the volumes in the owncloud container.
 

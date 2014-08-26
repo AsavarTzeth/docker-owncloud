@@ -39,7 +39,7 @@ In the future I might put in an `OWNCLOUD_DATA_TRUE` variable, or similar that y
 
 By default the entrypoint script will create a self-signed certificate and place it in */etc/ssl/nginx/*. You may change the location to fit your need with the honored environment variables listed above.
 
-Currently the best way of adding a cert & key to your container is with a Dockerfile, using "ADD /path/to/ssl/on/host /etc/ssl/nginx/ssl.(crt|key)". This requires full knowledge of Dockerfiles and is not ideal for users. I would prefer it if docker.io added support for "docker add" as a command line argument.
+Currently the best way of adding a cert & key to your container is with a Dockerfile, using the docker ADD instruction. This requires full knowledge of Dockerfiles and is not ideal for some users. I would prefer it if docker.io added support for running "docker add" on the command line.
 
 If anyone have a user-friendly way of adding files to already built and running containers, please share it.
 

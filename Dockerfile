@@ -37,9 +37,12 @@ RUN apt-get install -y --no-install-recommends \
         smbclient
 
 WORKDIR /usr/src/owncloud
-ADD . /usr/src/owncloud
+ADD owncloud-7.0.0.tar.bz2 .
+ADD config .
+ADD nginx.conf .
+
 RUN rm $CONF_NGINX/nginx.conf && \
-    tar --strip-components=1 -xf owncloud-*.tar.bz2
+    mkdir -p $WEB_ROOT -p $SSL_DIR
 
 ADD docker-entrypoint.sh /entrypoint.sh
 RUN chmod 744 /entrypoint.sh

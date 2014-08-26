@@ -62,20 +62,26 @@ fi
 : ${OWNCLOUD_SSL_CERT:=$SSL_DIR/ssl.crt}
 : ${OWNCLOUD_SSL_CERT_KEY:=$SSL_DIR/ssl.key}
 if ! [ -f "$SSL_DIR/ssl.crt" -a -f "$SSL_DIR/ssl.key" ]; then
-    expect << EOF
-	set timeout 600
-	set send_slow {1 1}
-	openssl req -x509 -newkey rsa:2048 -keyout $SSL_DIR/ssl.key -out $SSL_DIR/ssl.crt -nodes -days XXX
+    expect <<EOF
+	set send_slow {1 .1}
+	proc send {ignore arg} {
+	    sleep .1
+	    exp_send -s -- \$arg
+	}
+	set timeout 60
+
+	spawn openssl req -x509 -newkey rsa:2048 -keyout $SSL_DIR/ssl.key -out $SSL_DIR/ssl.crt -nodes -days XXX
 	expect {
-	    "Country Name (2 letter code) [AU]:" { exp_continue }
-	    "State or Province Name (full name) [Some-State]:" { exp_continue }
-	    "Locality Name (eg, city) []:" { exp_continue }
-	    "Organization Name (eg, company) [Internet Widgits Pty Ltd]:" { exp_continue }
-	    "Organizational Unit Name (eg, section) []:" { exp_continue }
-	    "Common Name (e.g. server FQDN or YOUR name) []:" { sleep 1; send "docker-owncloud"; exp_continue }
-	    "Email Address []:" { exp_continue }
+	    -exact "Country Name (2 letter code) \[AU\]:" { send -- ".\r"; exp_continue }
+	    -exact "State or Province Name (full name) \[Some-State\]:" { send -- ".\r"; exp_continue }
+	    -exact "Locality Name (eg, city) \[\]:" { send -- ".\r"; exp_continue }
+	    -exact "Organization Name (eg, company) \[Internet Widgits Pty Ltd\]:" { send -- ".\r"; exp_continue }
+	    -exact "Organizational Unit Name (eg, section) \[\]:" { send -- ".\r"; exp_continue }
+	    -exact "Common Name (e.g. server FQDN or YOUR name) \[\]:" { sleep 1; send -- "docker-owncloud\r"; exp_continue }
+	    -exact "Email Address \[\]:" { send -- ".\r"; exp_continue }
 	}
 EOF
+
     chmod 600 $SSL_DIR/ssl.*
 fi
 
@@ -83,7 +89,7 @@ fi
 
 if ! [ -e $WEB_ROOT/index.php -a -e $WEB_ROOT/version.php ]; then
     echo >&2 "owncloud not found in $WEB_ROOT - copying now..."
-    rsync --archive --one-file-system --quiet --exclude='*.sh' --exclude='*.conf' --exclude='*.bz2*' --exclude='Dockerfile' $SRC_DIR $WEB_ROOT/..
+    rsync -arxq --exclude='*.sh' --exclude='*.conf' $SRC_DIR $WEB_ROOT/..
     chown -R www-data:www-data $WEB_ROOT
     find "$WEB_ROOT" -type d -exec chmod 750 {} \;
     find "$WEB_ROOT" -type f -exec chmod 640 {} \;
@@ -92,10 +98,9 @@ fi
 
 # TODO handle ownCloud upgrades magically in the same way, but only if version.php's $OC_VersionString is less than /usr/src/owncloud/version.php's $OC_VersionString
 
-# If $CONF_DIR/nginx.conf is missing, copy from $SRC_DIR
 if ! [ -e $CONF_NGINX/nginx.conf ]; then
     echo >&2 "nginx.conf not found in $CONF_NGINX - copying now..."
-    cp -a $SRC_DIR/nginx.conf $CONF_NGINX
+    rsync -axq $SRC_DIR/nginx.conf $CONF_NGINX
     echo >&2 "Complete! nginx.conf has been successfully copied to $CONF_NGINX"
 fi
 

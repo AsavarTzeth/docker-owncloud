@@ -95,9 +95,9 @@ set_config() {
     if [ "$config_file" = "$CONF_NGINX/nginx.conf" ]; then
         sed -ri "s|\S*($key)\s+[^;]*|\1 $value|g" $config_file
     elif [ "$config_file" = "$CONF_OWNCLOUD/config.php" ]; then
-        sed -ri "s|\S*($key\S+ =>)[^,]*|\1 \"$value\"|g" $config_file
+        sed -ri "s|($key\S+ =>)[^,]*|\1 \"$value\"|g" $config_file
     elif [ "$config_file" = "$CONF_OWNCLOUD/autoconfig.php" ]; then
-	sed -ri "s|\S*($key\S+ =>)[^,]*|\1 \"$value\"|g" $config_file
+	sed -ri "s|($key\S+ =>)[^,]*|\1 \"$value\"|g" $config_file
     fi
 }
 

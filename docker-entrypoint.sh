@@ -46,17 +46,11 @@ fi
 
 # TODO Detect if sql container is linked and override $OWNCLOUD_DB_TYPE accordingly, if still set to sqlite
 
-# If we're linked to PHP5-FPM, get settings from there, else set defaults locally.
-: ${PHP5_FPM_MEMORY_LIMIT:=128M}
-: ${PHP5_FPM_LOG_LEVEL:=notice}
-: ${PHP5_FPM_LISTEN:=127.0.0.1:9000}
-if [ -n "$PHP5_FPM_PORT_9000_TCP" ]; then
-    : ${PHP5_FPM_MEMORY_LIMIT:=$PHP5_FPM_ENV_PHP5_FPM_MEMORY_LIMIT}
-    : ${PHP5_FPM_LOG_LEVEL:=$PHP5_FPM_ENV_PHP5_FPM_LOG_LEVEL}
-    : ${PHP5_FPM_LISTEN:=$PHP5_FPM_ENV_PHP5_FPM_LISTEN}
+# If we're linked to PHP5-FPM, get the internal docker ip address used by the php5-fpm container.
+# This ip will then be used in the nginx.conf to provice fpm functionallity.
+if [ -n "$PHP5_FPM_PORT_9000_TCP_ADDR" ]; then
+    sed -i "s|%fpm-ip%|$PHP5_FPM_PORT_9000_TCP_ADDR|g" /etc/nginx.conf
 fi
-
-# TODO check value "$PHP5_FPM_LISTEN" in case unix socket is used. If it is edit nginx.conf accordingly.
 
 # If no SSL certificate exists generate a self-signed one.
 : ${OWNCLOUD_SSL_CERT:=$SSL_DIR/ssl.crt}
@@ -87,22 +81,7 @@ fi
 
 # TODO handle and use a CA, preferably located outside container, so certificates can be revoked.
 
-if ! [ -e $WEB_ROOT/index.php -a -e $WEB_ROOT/version.php ]; then
-    echo >&2 "owncloud not found in $WEB_ROOT - copying now..."
-    rsync -arxq --exclude='*.sh' --exclude='*.conf' $SRC_DIR $WEB_ROOT/..
-    chown -R www-data:www-data $WEB_ROOT
-    find "$WEB_ROOT" -type d -exec chmod 750 {} \;
-    find "$WEB_ROOT" -type f -exec chmod 640 {} \;
-    echo >&2 "Complete! owncloud has been successfully copied to $WEB_ROOT"
-fi
-
-# TODO handle ownCloud upgrades magically in the same way, but only if version.php's $OC_VersionString is less than /usr/src/owncloud/version.php's $OC_VersionString
-
-if ! [ -e $CONF_NGINX/nginx.conf ]; then
-    echo >&2 "nginx.conf not found in $CONF_NGINX - copying now..."
-    rsync -axq $SRC_DIR/nginx.conf $CONF_NGINX
-    echo >&2 "Complete! nginx.conf has been successfully copied to $CONF_NGINX"
-fi
+# TODO handle ownCloud upgrades by checking version.php
 
 # TODO Optional installation and config of php5 cache.
 
@@ -121,6 +100,8 @@ set_config() {
         done
     elif [ "$config_file" = "$CONF_OWNCLOUD/config.php" ]; then
         sed -ri "s|\S*($key\S+ =>)[^,]*|\1 \"$value\"|g" $config_file
+    elif [ "$config_file" = "$CONF_OWNCLOUD/autoconfig.php" ]; then
+	sed -ri "s|\S*($key\S+ =>)[^,]*|\1 \"$value\"|g" $config_file
     fi
 }
 
@@ -141,6 +122,12 @@ set_config 'dbpassword' "$OWNCLOUD_DB_PASSWORD"
 set_config 'dbname' "$OWNCLOUD_DB_NAME"
 set_config 'forcessl' "$OWNCLOUD_FORCE_SSL"
 set_config 'loglevel' "$OWNCLOUD_LOG_LEVEL"
+
+config_file="$CONF_OWNCLOUD/autoconfig.php"
+set_config 'dbtype' "$OWNCLOUD_DB_TYPE"
+set_config 'dbuser' "$OWNCLOUD_DB_USER"
+set_config 'dbpass' "$OWNCLOUD_DB_PASSWORD"
+set_config 'dbname' "$OWNCLOUD_DB_NAME"
 
 #TERM=dumb php -- "$OWNCLOUD_DB_HOST" "$OWNCLOUD_DB_USER" "$OWNCLOUD_DB_PASSWORD" "$OWNCLOUD_DB_NAME" <<'EOPHP'
 #<?php

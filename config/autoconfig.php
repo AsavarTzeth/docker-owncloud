@@ -6,6 +6,6 @@ $AUTOCONFIG = array(
 "dbpass" => "",
 "dbhost" => "localhost",
 "dbtableprefix" => "oc",
-"adminlogin" => "oc_admin",
+"adminlogin" => "admin",
 "adminpass" => "",
 );

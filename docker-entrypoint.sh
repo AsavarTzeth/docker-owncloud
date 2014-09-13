@@ -94,10 +94,6 @@ set_config() {
     value="$2"
     if [ "$config_file" = "$CONF_NGINX/nginx.conf" ]; then
         sed -ri "s|\S*($key)\s+[^;]*|\1 $value|g" $config_file
-    elif [ "$config_file" = "$CONF_PHP5" ]; then
-        for i in $(find $CONF_PHP5 -type f); do
-            sed -ri "s|\S*($key\s+=).*|\1 $value|g" $i
-        done
     elif [ "$config_file" = "$CONF_OWNCLOUD/config.php" ]; then
         sed -ri "s|\S*($key\S+ =>)[^,]*|\1 \"$value\"|g" $config_file
     elif [ "$config_file" = "$CONF_OWNCLOUD/autoconfig.php" ]; then
@@ -109,11 +105,6 @@ config_file="$CONF_NGINX/nginx.conf"
 set_config 'server_name' "$OWNCLOUD_DOMAIN_NAME"
 set_config 'ssl_certificate' "$OWNCLOUD_SSL_CERT"
 set_config 'ssl_certificate_key' "$OWNCLOUD_SSL_CERT_KEY"
-
-config_file="$CONF_PHP5"
-set_config 'memory_limit' "$PHP5_FPM_MEMORY_LIMIT"
-set_config 'log_level' "$PHP5_FPM_LOG_LEVEL"
-set_config 'listen' "$PHP5_FPM_LISTEN"
 
 config_file="$CONF_OWNCLOUD/config.php"
 set_config 'dbtype' "$OWNCLOUD_DB_TYPE"

@@ -1,3 +1,4 @@
+
 FROM asavartzeth/nginx
 MAINTAINER Patrik Nilsson <asavartzeth@gmail.com>
 
@@ -18,17 +19,6 @@ RUN apt-get update && apt-get -o Dpkg::Options::="--force-confold" install -y --
         libav-tools \
         libreoffice \
 	openssl \
-        php5-curl \
-        php5-fpm \
-        php5-gd \
-        php5-intl \
-        php5-imagick \
-        php5-ldap \
-        php5-mcrypt \
-        php5-mhash \
-        php5-mysql \
-        php5-pgsql \
-	php5-sqlite \
         smbclient
 
 # See https://owncloud.org/owncloud.asc

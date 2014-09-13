@@ -85,7 +85,7 @@ fi
 
 # TODO Optional installation and config of php5 cache.
 
-: ${OWNCLOUD_DOMAIN_NAME:=localhost}
+\1 $value: ${OWNCLOUD_DOMAIN_NAME:=localhost}
 : ${OWNCLOUD_FORCE_SSL:=true}
 : ${OWNCLOUD_LOG_LEVEL:=WARN}
 
@@ -93,7 +93,7 @@ set_config() {
     key="$1"
     value="$2"
     if [ "$config_file" = "$CONF_NGINX/nginx.conf" ]; then
-        sed -ri "s|\S*($key)\s+[^;]*|\1 $value|g" $config_file
+        sed -ri "s|($key)\s+[^;]*|\1 $value|g" $config_file
     elif [ "$config_file" = "$CONF_OWNCLOUD/config.php" ]; then
         sed -ri "s|($key\S+ =>)[^,]*|\1 \"$value\"|g" $config_file
     elif [ "$config_file" = "$CONF_OWNCLOUD/autoconfig.php" ]; then

@@ -49,6 +49,7 @@ fi
 if [ -z "$PHP5_FPM_PORT_9000_TCP_ADDR" ]; then
 	echo >&2 'error: missing required PHP5_FPM_PORT_9000_TCP_ADDR environment variable'
 	echo >&2 ' Did you forget to --link some_php5_fpm_container:php5_fpm ?'
+	echo >&2 ' Unfortunatly a built-in instance is not supported at this time.'
 	exit 1
 fi
 
@@ -87,9 +88,13 @@ fi
 
 # TODO Optional installation and config of php5 cache.
 
-\1 $value: ${OWNCLOUD_DOMAIN_NAME:=localhost}
+: ${OWNCLOUD_DOMAIN_NAME:=localhost}
 : ${OWNCLOUD_FORCE_SSL:=true}
+
+# Possible values: DEBUG, INFO, WARN, ERROR
 : ${OWNCLOUD_LOG_LEVEL:=WARN}
+# Possible values: debug, info, notice, warn, error, crit, alert, emerg
+# Debug logging requires nginx container to be built with --with-debug (not in upstream)
 : ${NGINX_LOG_LEVEL:=error}
 
 set_config() {
@@ -109,6 +114,7 @@ set_config '%hostname%' "$OWNCLOUD_DOMAIN_NAME"
 set_config '%ssl-crt%' "$OWNCLOUD_SSL_CERT"
 set_config '%ssl-key%' "$OWNCLOUD_SSL_CERT_KEY"
 set_config '%fpm-ip' "$PHP5_FPM_PORT_9000_TCP_ADDR"
+set_config '%log-level%' "$NGINX_LOG_LEVEL"
 
 config_file="$CONF_OWNCLOUD/config.php"
 set_config 'dbtype' "$OWNCLOUD_DB_TYPE"

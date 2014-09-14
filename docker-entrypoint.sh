@@ -44,13 +44,15 @@ if [ "$OWNCLOUD_DB_TYPE" != 'sqlite' ]; then
 	fi
 fi
 
-# TODO Detect if sql container is linked and override $OWNCLOUD_DB_TYPE accordingly, if still set to sqlite
-
-# If we're linked to PHP5-FPM, get the internal docker ip address used by the php5-fpm container.
-# This ip will then be used in the nginx.conf to provice fpm functionallity.
-if [ -n "$PHP5_FPM_PORT_9000_TCP_ADDR" ]; then
-    sed -i "s|%fpm-ip%|$PHP5_FPM_PORT_9000_TCP_ADDR|g" /etc/nginx.conf
+# From now on a standalone php5-fpm instance is required.
+# If fpm link of type "php5-fpm" is missing, exit.
+if [ -z "$PHP5_FPM_PORT_9000_TCP_ADDR" ]; then
+	echo >&2 'error: missing required PHP5_FPM_PORT_9000_TCP_ADDR environment variable'
+	echo >&2 ' Did you forget to --link some_php5_fpm_container:php5_fpm ?'
+	exit 1
 fi
+
+# TODO Detect if sql container is linked and override $OWNCLOUD_DB_TYPE accordingly, if still set to sqlite
 
 # If no SSL certificate exists generate a self-signed one.
 : ${OWNCLOUD_SSL_CERT:=$SSL_DIR/ssl.crt}
@@ -88,12 +90,13 @@ fi
 \1 $value: ${OWNCLOUD_DOMAIN_NAME:=localhost}
 : ${OWNCLOUD_FORCE_SSL:=true}
 : ${OWNCLOUD_LOG_LEVEL:=WARN}
+: ${NGINX_LOG_LEVEL:=error}
 
 set_config() {
     key="$1"
     value="$2"
     if [ "$config_file" = "$CONF_NGINX/nginx.conf" ]; then
-        sed -ri "s|($key)\s+[^;]*|\1 $value|g" $config_file
+        sed -ri "s|$key|$value|g" $config_file
     elif [ "$config_file" = "$CONF_OWNCLOUD/config.php" ]; then
         sed -ri "s|($key\S+ =>)[^,]*|\1 \"$value\"|g" $config_file
     elif [ "$config_file" = "$CONF_OWNCLOUD/autoconfig.php" ]; then
@@ -102,9 +105,10 @@ set_config() {
 }
 
 config_file="$CONF_NGINX/nginx.conf"
-set_config 'server_name' "$OWNCLOUD_DOMAIN_NAME"
-set_config 'ssl_certificate' "$OWNCLOUD_SSL_CERT"
-set_config 'ssl_certificate_key' "$OWNCLOUD_SSL_CERT_KEY"
+set_config '%hostname%' "$OWNCLOUD_DOMAIN_NAME"
+set_config '%ssl-crt%' "$OWNCLOUD_SSL_CERT"
+set_config '%ssl-key%' "$OWNCLOUD_SSL_CERT_KEY"
+set_config '%fpm-ip' "$PHP5_FPM_PORT_9000_TCP_ADDR"
 
 config_file="$CONF_OWNCLOUD/config.php"
 set_config 'dbtype' "$OWNCLOUD_DB_TYPE"

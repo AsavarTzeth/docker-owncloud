@@ -113,7 +113,7 @@ config_file="$CONF_NGINX/nginx.conf"
 set_config '%hostname%' "$OWNCLOUD_DOMAIN_NAME"
 set_config '%ssl-crt%' "$OWNCLOUD_SSL_CERT"
 set_config '%ssl-key%' "$OWNCLOUD_SSL_CERT_KEY"
-set_config '%fpm-ip' "$PHP5_FPM_PORT_9000_TCP_ADDR"
+set_config '%fpm-ip%' "$PHP5_FPM_PORT_9000_TCP_ADDR"
 set_config '%log-level%' "$NGINX_LOG_LEVEL"
 
 config_file="$CONF_OWNCLOUD/config.php"

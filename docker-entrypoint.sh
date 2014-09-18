@@ -78,13 +78,22 @@ if ! [ -f "$SSL_DIR/ssl.crt" -a -f "$SSL_DIR/ssl.key" ]; then
 	    -exact "Email Address \[\]:" { send -- ".\r"; exp_continue }
 	}
 EOF
-
-    chmod 600 $SSL_DIR/ssl.*
+        chown -R www-data:www-data $SSL_DIR
+	chmod 600 $SSL_DIR/ssl.*
 fi
 
 # TODO handle and use a CA, preferably located outside container, so certificates can be revoked.
 
-# TODO handle ownCloud upgrades by checking version.php
+if ! [ -e $WEB_ROOT/index.php -a -e $WEB_ROOT/version.php ]; then
+	echo >&2 "owncloud not found in $WEB_ROOT - copying now..."
+	rsync -arxq $SRC_DIR/ $WEB_ROOT
+	chown -R www-data:www-data $WEB_ROOT
+	find "$WEB_ROOT" -type d -exec chmod 750 {} \;
+	find "$WEB_ROOT" -type f -exec chmod 640 {} \;
+	echo >&2 "Complete! owncloud has been successfully copied to $WEB_ROOT"
+fi
+
+# TODO handle ownCloud upgrades magically in the same way, but only if version.php's $OC_VersionString is less than /usr/src/owncloud/version.php's $OC_VersionString
 
 # TODO Optional installation and config of php5 cache.
 
